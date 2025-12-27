@@ -59,6 +59,7 @@ resource "aws_instance" "devops_server" {
   vpc_security_group_ids = [aws_security_group.integrated_sg.id]
 
   # Startup Script: Installs Java, Jenkins, Docker, and Ansible
+  # Updated User Data (Includes Git)
   user_data = <<-EOF
               #!/bin/bash
               sudo apt-get update
@@ -77,10 +78,14 @@ resource "aws_instance" "devops_server" {
               sudo apt-get install -y docker.io
               sudo usermod -aG docker jenkins
               
-              # 3. Install Ansible
+              # 3. Install Git (CRITICAL NEW LINE)
+              sudo apt-get install -y git
+
+              # 4. Install Ansible & Python Pip
               sudo apt-get install -y ansible
+              sudo apt-get install -y python3-pip
               
-              # 4. Restart Services
+              # 5. Restart Services
               sudo systemctl restart jenkins
               EOF
 

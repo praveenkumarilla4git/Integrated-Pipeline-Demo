@@ -1,0 +1,14 @@
+---
+- name: Deploy Docker Container via Jenkins
+  hosts: localhost
+  connection: local
+  become: yes
+
+  tasks:
+    - name: Stop old container
+      shell: docker rm -f my-running-app || true
+
+    - name: Run new container
+      shell: |
+        docker run -d -p 5000:80 --name my-running-app \
+        praveenkumarilla459/my-python-app:{{ build_id }}

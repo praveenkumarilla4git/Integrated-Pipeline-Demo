@@ -7,7 +7,7 @@ WORKDIR /app
 # Copy all files (app.py and templates/) into the container
 COPY . .
 
-# 1. INSTALL FLASK (This was missing!)
+# 1. INSTALL FLASK (This was missing)
 RUN pip install flask
 
 # 2. USE 'CMD' INSTEAD OF 'RUN' to start the app

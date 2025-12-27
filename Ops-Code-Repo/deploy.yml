@@ -2,7 +2,7 @@
 - name: Deploy Docker Container via Jenkins
   hosts: localhost
   connection: local
-  become: yes
+  # become: yes  <-- DELETED THIS LINE
 
   tasks:
     - name: Stop old container

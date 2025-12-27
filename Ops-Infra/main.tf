@@ -5,7 +5,7 @@ terraform {
       version = "~> 5.0"
     }
   }
-  # Backend config cannot use variables, so we hardcode the bucket here
+  # Backend config - Stores the state file in your S3 bucket
   backend "s3" {
     bucket = "tf-state-praveen2-2025"
     key    = "integrated-pipeline/terraform.tfstate"
@@ -17,11 +17,12 @@ provider "aws" {
   region = var.aws_region
 }
 
-# 1. Security Group
+# 1. Security Group (The Firewall)
 resource "aws_security_group" "integrated_sg" {
   name        = "integrated_pipeline_sg"
-  description = "Allow SSH, Jenkins, and App"
+  description = "Allow SSH, Jenkins, and App traffic"
 
+  # SSH Access (For you to connect)
   ingress {
     description = "SSH"
     from_port   = 22
@@ -29,13 +30,17 @@ resource "aws_security_group" "integrated_sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  # Jenkins & Webhook Access (Crucial: 0.0.0.0/0 allows GitHub to connect)
   ingress {
-    description = "Jenkins Console"
+    description = "Jenkins Console & GitHub Webhook"
     from_port   = 8080
     to_port     = 8080
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  # Application Access (To see your website)
   ingress {
     description = "App Traffic"
     from_port   = 5000
@@ -43,6 +48,8 @@ resource "aws_security_group" "integrated_sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  # Outbound Traffic (Allow server to download updates)
   egress {
     from_port   = 0
     to_port     = 0
@@ -51,15 +58,14 @@ resource "aws_security_group" "integrated_sg" {
   }
 }
 
-# 2. The Server
+# 2. The Server (EC2 Instance)
 resource "aws_instance" "devops_server" {
   ami                    = var.ami_id
   instance_type          = var.instance_type
   key_name               = var.key_name
   vpc_security_group_ids = [aws_security_group.integrated_sg.id]
 
-  # Startup Script: Installs Java, Jenkins, Docker, and Ansible
-  # Updated User Data (Includes Git)
+  # Startup Script: Installs Java, Jenkins, Docker, Git, and Ansible
   user_data = <<-EOF
               #!/bin/bash
               sudo apt-get update
@@ -78,7 +84,7 @@ resource "aws_instance" "devops_server" {
               sudo apt-get install -y docker.io
               sudo usermod -aG docker jenkins
               
-              # 3. Install Git (CRITICAL NEW LINE)
+              # 3. Install Git (CRITICAL: Required for Jenkins Checkout)
               sudo apt-get install -y git
 
               # 4. Install Ansible & Python Pip

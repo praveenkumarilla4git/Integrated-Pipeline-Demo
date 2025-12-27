@@ -10,7 +10,7 @@ html_content = f"""
 <head>
     <title>Integrated DevOps Pipeline</title>
     <style>
-        body {{ background-color: #007acc; color: #ffffff; font-family: Arial, sans-serif; text-align: center; padding-top: 50px; }}
+        body {{ background-color: ##800080; color: #ffffff; font-family: Arial, sans-serif; text-align: center; padding-top: 50px; }}
         h1 {{ color: #4CAF50; }}
         .box {{ border: 2px solid #4CAF50; padding: 20px; display: inline-block; border-radius: 10px; }}
     </style>
